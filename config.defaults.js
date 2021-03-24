@@ -15,5 +15,6 @@
 
 module.exports = {
   domain: 'localhost',
+  token: 'god',
   port: 8080, // Port you can hit to get current status
 }
