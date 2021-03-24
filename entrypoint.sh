@@ -1,9 +1,9 @@
 #! /bin/bash
 
-SERVICE_ROOT="/code/trellis-monitor"
+SERVICE_ROOT="/code/snatchbot"
 
 chmod u+x ${SERVICE_ROOT}/wait-for-it.sh && \
-  ${SERVICE_ROOT}/wait-for-it.sh startup:80 -t 0 && \
+  ${SERVICE_ROOT}/wait-for-it.sh startup:8080 -t 0 && \
   cd ${SERVICE_ROOT}
 
 if [ -z ${DEBUG+x} ]; then export DEBUG="*info*,*warn*,*error*"; fi

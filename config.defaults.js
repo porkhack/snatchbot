@@ -15,11 +15,5 @@
 
 module.exports = {
   domain: 'localhost',
-  incomingToken: 'god',
-  tokenToRequestAgainstOADA: 'god',
-  timeout: 10*60*1000, // 10 minutes
-  postInterval: 30*60*1000, // post every half an hour
-  cron: "*/15 * * * *",
-  notifyurl: false,
-  port: 80, // Port you can hit to get current status
+  port: 8080, // Port you can hit to get current status
 }

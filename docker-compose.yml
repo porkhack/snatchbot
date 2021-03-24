@@ -1,21 +1,17 @@
 version: '3.9'
 
 services:
-  trellis-monitor:
+  snatchbot:
     build:
       context: .
-    container_name: trellis-monitor
     ports:
-      - 80
+      - 8080
     restart: unless-stopped
     volumes:
-      - .:/code/trellis-monitor
+      - .:/code/snatchbot
     environment:
       - NODE_TLS_REJECT_UNAUTHORIZED
       - NODE_ENV=${NODE_ENV:-development}
       - DEBUG=${DEBUG:-*info*,*warn*,*error*}
-      - notifyurl
       - domain
-      - tokenToRequestAgainstOADA
-      - incomingToken
-      - cron
+      - token
