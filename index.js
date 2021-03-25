@@ -55,6 +55,8 @@ const token = config.get("token");
 
   trace("Setting up express");
   const app = express();
+  app.use(express.urlencoded());
+  app.use(express.json());
 
   app.get("/", async (req, res) => {
     console.log("The snatchbot endpoint was called!  req = ", req);
@@ -70,6 +72,30 @@ const token = config.get("token");
     }*/
 
     res.json({ hello: "test" });
+  });
+
+  app.post("/post", (req, res) => {
+    console.log("POST received:", req.body);
+    if (!req || !req.headers) {
+      trace("no headers!");
+      return res.end();
+    }
+    if (
+      !req.body ||
+      !req.body.user_id ||
+      !req.body.bot_id ||
+      !req.body.module_id
+    ) {
+      trace("Unrecognized format");
+      return res.end();
+    }
+    const obj = {
+      user_id: req.body.user_id,
+      bot_id: req.body.bot_id,
+      module_id: req.body.module_id,
+      message: "Response",
+    };
+    res.json(obj);
   });
 
   trace("Starting express....");
