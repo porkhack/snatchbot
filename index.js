@@ -74,7 +74,7 @@ const token = config.get("token");
     res.json({ hello: "test" });
   });
 
-  app.post("/post", (req, res) => {
+  app.post("/snatchbot/post", (req, res) => {
     console.log("POST received:", req.body);
     if (!req || !req.headers) {
       trace("no headers!");
