@@ -56,7 +56,7 @@ const token = config.get("token");
   trace("Setting up express");
   const app = express();
 
-  app.get("/", async (req, res) => {
+  app.get("/snatchbot", async (req, res) => {
     console.log("The snatchbot endpoint was called!  req = ", req);
 
     /*
