@@ -15,3 +15,6 @@ services:
       context: ./services/snatchbot
     volumes:
       - ./services/snatchbot:/code/snatchbot
+    networks:
+      - http_net
+      - startup_net
