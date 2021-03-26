@@ -4,7 +4,7 @@ const trees = require("@pork/trees");
 const express = require("express");
 const config = require("./config");
 const debug = require("debug");
-
+const ksuid = require("ksuid");
 const trace = debug("snatchbot:trace");
 const info = debug("snatchbot:info");
 const warn = debug("snatchbot:warn");
@@ -31,7 +31,6 @@ const token = "changeme";
 
   // user states
   let session = new Map();
-
   trace("Setting up express");
   const app = express();
   app.use(express.urlencoded());
@@ -113,6 +112,7 @@ const token = "changeme";
       farmerid: "", // TODO
       haulerid: "", // TODO
     };
+    state.asn.farmer.processorid = state.processors[responseVal].id;
     var str = `Cool. The processor is ${state.processors[responseVal].name}.::next::What barn are you pulling from?\n`;
     state.locations.forEach(function (item, idx) {
       str += `${idx}) ${item.name}\n`;
@@ -153,11 +153,34 @@ const token = "changeme";
     res.json(obj);
   });
 
+  app.post("/snatchbot/estdate", (req, res) => {
+    if (!session.has(req.body.user_id)) {
+      return res.end();
+    }
+    var state = session.get(req.body.user_id);
+    const responseVal = parseInt(req.body.incoming_message);
+    state.asn.hauler = {
+      name: state.haulers[responseVal].name,
+      processorid: "",
+      farmerid: "",
+    };
+    state.asn.farmer.haulerid = state.haulers[responseVal].id;
+    var str = `Got it.::next::Estimated date of shipping (YYYY-MM-DD)?\n`;
+    const obj = {
+      user_id: req.body.user_id,
+      bot_id: req.body.bot_id,
+      module_id: req.body.module_id,
+      message: str,
+    };
+    res.json(obj);
+  });
+
   app.post("/snatchbot/heads", (req, res) => {
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+    state.asn.shipdate = req.body.incoming_message;
     var str = `Got it.::next::Estimated # of head?\n`;
     const obj = {
       user_id: req.body.user_id,
@@ -174,14 +197,42 @@ const token = "changeme";
     }
     var state = session.get(req.body.user_id);
     const responseVal = parseInt(req.body.incoming_message);
-    var str = `Great, we're almost done.::next::This is what we have so far:\nSending to ${state.asn.processor.name},\nPulling from ${state.asn.scheduled.shipfromlocation.name},\nEst. number of heads is ${responseVal}.`;
+    var str = `Great, we're almost done.::next::This is what we have so far:\nSending to ${state.asn.processor.name},\nPulling from ${state.asn.scheduled.shipfromlocation.name},\nEst. number of heads is ${responseVal}.::next:: Looks good?`;
     const obj = {
       user_id: req.body.user_id,
       bot_id: req.body.bot_id,
       module_id: req.body.module_id,
       message: str,
+      suggested_replies: ["Yes", "No"],
     };
     res.json(obj);
+  });
+
+  app.post("/snatchbot/done", async (req, res) => {
+    if (!session.has(req.body.user_id)) {
+      return res.end();
+    }
+    var state = session.get(req.body.user_id);
+    const responseVal = req.body.incoming_message;
+    if (responseVal === "Yes") {
+      const randStr = ksuid.randomSync().string;
+      const path = `/bookmarks/trellisfw/asns/day-index/${state.asn.shipdate}/${randStr}`;
+      await oada.put({
+        path,
+        tree: trees.asn,
+        data: state.asn,
+      });
+      var str = "Shipment scheduled.";
+      const obj = {
+        user_id: req.body.user_id,
+        bot_id: req.body.bot_id,
+        module_id: req.body.module_id,
+        message: str,
+      };
+      res.json(obj);
+    } else {
+      return res.end();
+    }
   });
 
   trace("Starting express....");
