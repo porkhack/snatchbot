@@ -136,8 +136,8 @@ const token = "changeme";
     state.asn.scheduled = {
       shipfromlocation: {
         name: state.locations[responseVal].name,
-        premiseid: state.locations[responseVal].id,
-        address: state.locations[responseVal].address,
+        premiseid: state.locations[responseVal].premiseid,
+        id: state.locations[responseVal].id,
       },
     };
     var str = `Got it. ::next::Which hauler do you want to use?\n`;
@@ -197,7 +197,8 @@ const token = "changeme";
     }
     var state = session.get(req.body.user_id);
     const responseVal = parseInt(req.body.incoming_message);
-    var str = `Great, we're almost done.::next::This is what we have so far:\nSending to ${state.asn.processor.name},\nPulling from ${state.asn.scheduled.shipfromlocation.name},\nEst. number of heads is ${responseVal}.::next:: Looks good?`;
+    state.asn.enroute = { head: { value: responseVal, units: "count" } };
+    var str = `Great, we're almost done.::next::This is what we have so far:\nSending to ${state.asn.processor.name},\nPulling from ${state.asn.scheduled.shipfromlocation.name} via ${state.asn.hauler.name},\nEst. number of heads is ${state.asn.enroute.head.value}.::next:: Looks good?`;
     const obj = {
       user_id: req.body.user_id,
       bot_id: req.body.bot_id,
