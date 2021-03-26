@@ -128,10 +128,12 @@ const token = "changeme";
   });
 
   app.post("/snatchbot/haulers", (req, res) => {
+    // delete old session info
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+
     const responseVal = parseInt(req.body.incoming_message);
     state.asn.scheduled = {
       shipfromlocation: {
@@ -154,10 +156,12 @@ const token = "changeme";
   });
 
   app.post("/snatchbot/estdate", (req, res) => {
+    // delete old session info
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+
     const responseVal = parseInt(req.body.incoming_message);
     state.asn.hauler = {
       name: state.haulers[responseVal].name,
@@ -176,10 +180,12 @@ const token = "changeme";
   });
 
   app.post("/snatchbot/heads", (req, res) => {
+    // delete old session info
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+
     state.asn.shipdate = req.body.incoming_message;
     var str = `Got it.::next::Estimated # of head?\n`;
     const obj = {
@@ -192,10 +198,12 @@ const token = "changeme";
   });
 
   app.post("/snatchbot/confirm", (req, res) => {
+    // delete old session info
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+
     const responseVal = parseInt(req.body.incoming_message);
     state.asn.enroute = { head: { value: responseVal, units: "count" } };
     var str = `Great, we're almost done.::next::This is what we have so far:\nSending to ${state.asn.processor.name},\nPulling from ${state.asn.scheduled.shipfromlocation.name} via ${state.asn.hauler.name},\nEst. number of heads is ${state.asn.enroute.head.value}.::next:: Looks good?`;
@@ -210,10 +218,12 @@ const token = "changeme";
   });
 
   app.post("/snatchbot/done", async (req, res) => {
+    // delete old session info
     if (!session.has(req.body.user_id)) {
       return res.end();
     }
     var state = session.get(req.body.user_id);
+
     const responseVal = req.body.incoming_message;
     if (responseVal === "Yes") {
       const randStr = ksuid.randomSync().string;
